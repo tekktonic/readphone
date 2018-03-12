@@ -78,7 +78,7 @@ plot.show()
 
 movement_sums = []
 for frame in num:
-    movement_sums.append(sum((abs(frame[LAT_X_INDEX]) + abs(frame[LAT_Y_INDEX]) + abs(frame[LAT_Z_INDEX]))))
+    movement_sums.append((abs(frame[LAT_X_INDEX]) + abs(frame[LAT_Y_INDEX]) + abs(frame[LAT_Z_INDEX])))
     
 plot.plot(time, movement_sums)
 plot.title("Total movement vs time.")
