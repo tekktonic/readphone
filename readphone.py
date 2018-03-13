@@ -30,6 +30,17 @@ def column(arr, col):
 data = p.read_csv("data.csv")
 
 
+def is_low_light(frame):
+    return (frame[LUX_INDEX] < 200)
+
+def is_close(frame):
+    return frame[PROXIMITY_INDEX] < 5
+
+def is_audible(frame):
+    return frame[DECIBEL_INDEX] > 60
+
+def is_active(frame):
+    return (abs(frame[LAT_X_INDEX]) + abs(frame[LAT_Y_INDEX]) + abs(frame[LAT_Z_INDEX])) > 1
 num = data.values
 
 light = column(num, 12)
@@ -37,14 +48,14 @@ time = column(num, TIME_INDEX)
 time = [time / 1000.0 for time in time]
 
 # According to Microsoft user guides, dim indoor lighting is about 200 lux.
-low_light_frames = [frame for frame in num if frame[LUX_INDEX] < 200]
+low_light_frames = [frame for frame in num if is_low_light(frame)]
 
 # If the light is low and there's something right next to us, we're probably either on the phone or it's in the pocket.
 # My phone's proximity meter is binary: it's either 5 cm or 0 cm.
-pocket = [frame for frame in low_light_frames if frame[PROXIMITY_INDEX] < 5]
+pocket = [frame for frame in low_light_frames if is_close(frame)]
 
 # 60 decibels is the volume of a normal conversation.
-noisy = [frame for frame in pocket if frame[DECIBEL_INDEX] > 60]
+noisy = [frame for frame in pocket if is_audible(frame)]
 print("There are " + str(len(num)) + " frames of data in total.")
 print("There are " + str(len(low_light_frames)) + " sensor frames with low light")
 
@@ -54,7 +65,7 @@ print("The average light level overall was " + str(sum(column(num, LUX_INDEX))/l
 total_time = (num[-1][TIME_INDEX] - num[0][TIME_INDEX]) / 1000.0
 
 
-active_time = [frame for frame in num if ((abs(frame[LAT_X_INDEX]) + abs(frame[LAT_Y_INDEX]) + abs(frame[LAT_Z_INDEX])) > 1)]
+active_time = [frame for frame in num if is_active(frame)]
 
 print("Of those times when it was probably in my pocket, we probably were able to pick up on conversation for " + str(len(noisy)) + " of them.")
 
